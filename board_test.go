@@ -245,5 +245,60 @@ func TestMovePiece(t *testing.T) {
 			assert.NotEqual(t, Location{x: 2, y: 0}, board.pieces[piece])
 		}
 	}
+}
 
+func TestSetGoal(t *testing.T) {
+	board, _ := NewBoard(4, 5)
+	firstPiece, _ := NewPiece(10, 2, 2)
+	board.AddPiece(firstPiece, 2, 0) // piece is nestled in top right corner
+	secondPiece, _ := NewPiece(20, 1, 1)
+	board.AddPiece(secondPiece, 1, 1)
+	notInBoard, _ := NewPiece(30, 3, 3)
+
+	testcases := []struct {
+		piece *Piece
+		x, y  int
+		err   bool
+	}{
+		{notInBoard, 1, 1, true},
+		{firstPiece, 0, 0, false}, // piece is in top left corner
+		{firstPiece, 2, 3, false}, // piece is in bottom right corner
+		{firstPiece, 1, 2, false},
+		{firstPiece, -1, 2, true},
+		{firstPiece, 2, -4, true},
+		{firstPiece, -2, -4, true},
+		{firstPiece, -2, -4, true},
+		{firstPiece, 3, 3, true}, // piece sticks out of board on right
+		{firstPiece, 2, 4, true}, // piece sticks out of board on bottom
+	}
+
+	for _, testcase := range testcases {
+		err := board.SetGoal(testcase.piece, testcase.x, testcase.y)
+		if testcase.err {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err)
+		}
+	}
+}
+
+func TestIsSolved(t *testing.T) {
+	board, _ := NewBoard(4, 5)
+	piece, _ := NewPiece(10, 2, 2)
+	board.AddPiece(piece, 2, 0)
+	_ = board.SetGoal(piece, 1, 3) // goal is bottom middle
+
+	testcases := []struct {
+		x, y     int
+		isSovled bool
+	}{
+		{1, 1, false},
+		{1, 3, true},
+	}
+
+	for _, testcase := range testcases {
+		board.RemovePiece(piece)
+		board.AddPiece(piece, testcase.x, testcase.y)
+		assert.Equal(t, testcase.isSovled, board.IsSolved(), "Isn't in right solved state")
+	}
 }
