@@ -302,3 +302,37 @@ func TestIsSolved(t *testing.T) {
 		assert.Equal(t, testcase.isSovled, board.IsSolved(), "Isn't in right solved state")
 	}
 }
+
+func TestString(t *testing.T) {
+	board, _ := NewBoard(4, 5)
+	addPiece := func(id, x, y, xpos, ypos int) {
+		piece, err := NewPiece(id, x, y)
+		if err != nil {
+			t.Error(err)
+		}
+		err = board.AddPiece(piece, xpos, ypos)
+		if err != nil {
+			t.Error(err)
+		}
+	}
+
+	addPiece(10, 1, 2, 0, 0)
+	addPiece(11, 2, 2, 1, 0)
+	addPiece(12, 1, 2, 3, 0)
+	addPiece(13, 1, 2, 0, 2)
+	addPiece(14, 2, 1, 1, 2)
+	addPiece(15, 1, 2, 3, 2)
+	addPiece(16, 1, 1, 1, 3)
+	addPiece(17, 1, 1, 2, 3)
+	addPiece(18, 1, 1, 1, 4)
+	addPiece(19, 1, 1, 2, 4)
+
+	boardString := board.String()
+	expected :=
+		` 10  11  11  12 
+ 10  11  11  12 
+ 13  14  14  15 
+ 13  16  17  15 
+ **  18  19  ** `
+	assert.Equal(t, boardString, expected)
+}

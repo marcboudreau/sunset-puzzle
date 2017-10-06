@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"strconv"
 )
 
 // Orientation is a type that indicates in which direction the piece is moved.
@@ -189,6 +191,33 @@ func (p *Board) GetPieceAt(x, y int) (*Piece, error) {
 	}
 
 	return p.slots[x][y], nil
+}
+
+func (p *Board) String() string {
+	var buffer bytes.Buffer
+
+	for y := 0; y < p.Height; y++ {
+		for x := 0; x < p.Width; x++ {
+			piece, err := p.GetPieceAt(x, y)
+			if err != nil {
+				panic(err)
+			}
+
+			buffer.WriteString(" ")
+			if piece != nil {
+				buffer.WriteString(strconv.Itoa(piece.ID))
+			} else {
+				buffer.WriteString("**")
+			}
+			buffer.WriteString(" ")
+		}
+
+		if y < p.Height-1 {
+			buffer.WriteString("\n")
+		}
+	}
+
+	return buffer.String()
 }
 
 // IsSolved verifies whether the puzzle is in the solved state base on the goal set by SetGoal
